@@ -1,0 +1,10 @@
+{
+  "name": "jba",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Pedro Sartor <pedro.sartor@easylive.com.br>",
+  "license": "MIT",
+  "devDependencies": {
+    "hardhat": "^2.20.1"
+  }
+}
