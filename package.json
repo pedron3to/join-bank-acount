@@ -5,6 +5,8 @@
   "author": "Pedro Sartor <pedro.sartor@easylive.com.br>",
   "license": "MIT",
   "devDependencies": {
-    "hardhat": "^2.20.1"
+    "hardhat": "^2.20.1",
+    "prettier": "^3.2.5",
+    "prettier-plugin-solidity": "^1.3.1"
   }
 }
