@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.19;
 
 contract BankAccount {
     // 1. Events
@@ -44,9 +44,9 @@ contract BankAccount {
     uint nextWithdrawId;
 
     //5. modifiers
-    modifier accountOwner(uint accountId) {
+    modifier accountOwner(uint256 accountId) {
         bool isOwner;
-        for (uint idx; idx < accounts[accountId].owners.length; idx++) {
+        for (uint256 idx; idx < accounts[accountId].owners.length; idx++) {
             if (accounts[accountId].owners[idx] == msg.sender) {
                 isOwner = true;
                 break;
@@ -57,16 +57,18 @@ contract BankAccount {
     }
 
     modifier validOwners(address[] calldata owners) {
-        require(owners.length + 1 <= 4, "max of 4 owners per account");
+        require(owners.length + 1 <= 4, "maximum of 4 owners per account");
+        for (uint256 i; i < owners.length; i++) {
+            if (owners[i] == msg.sender) {
+                revert("no duplicate owners");
+            }
 
-        for (uint i; i < owners.length; i++) {
-            for (uint j = i + 1; j < owners.length; j++) {
+            for (uint256 j = i + 1; j < owners.length; j++) {
                 if (owners[i] == owners[j]) {
                     revert("no duplicate owners");
                 }
             }
         }
-
         _;
     }
 
@@ -75,21 +77,21 @@ contract BankAccount {
         _;
     }
 
-    modifier canApprove(uint accountId, uint withdrawId) {
+    modifier canApprove(uint256 accountId, uint256 withdrawId) {
         require(
             !accounts[accountId].withdrawRequests[withdrawId].approved,
-            "withdraw request already approved"
+            "this request is already approved"
         );
         require(
             accounts[accountId].withdrawRequests[withdrawId].user != msg.sender,
-            "you can approve this request"
+            "you cannot approve this request"
         );
         require(
             accounts[accountId].withdrawRequests[withdrawId].user != address(0),
-            "this request doest not exist"
+            "this request does not exist"
         );
         require(
-            accounts[accountId].withdrawRequests[withdrawId].ownersApproved[
+            !accounts[accountId].withdrawRequests[withdrawId].ownersApproved[
                 msg.sender
             ],
             "you have already approved this request"
@@ -109,6 +111,10 @@ contract BankAccount {
         _;
     }
 
+    modifier verifyAccounts(uint256[] memory accounts) {
+        _;
+    }
+
     //4. functions
 
     function deposit(uint accountId) external payable accountOwner(accountId) {
@@ -121,17 +127,16 @@ contract BankAccount {
         address[] memory owners = new address[](otherOwners.length + 1);
         owners[otherOwners.length] = msg.sender;
 
-        uint id = nextAccountId;
+        uint256 id = nextAccountId;
 
-        for (uint idx; idx < otherOwners.length; idx++) {
+        for (uint256 idx; idx < owners.length; idx++) {
             if (idx < owners.length - 1) {
                 owners[idx] = otherOwners[idx];
             }
 
-            if (userAccounts[otherOwners[idx]].length > 2) {
-                revert("each user can only have max of 3 accounts");
+            if (userAccounts[owners[idx]].length > 2) {
+                revert("each user can have a max of 3 accounts");
             }
-
             userAccounts[owners[idx]].push(id);
         }
 
@@ -161,9 +166,9 @@ contract BankAccount {
         );
     }
 
-    function approveWithdrawal(
-        uint accountId,
-        uint withdrawId
+    function approveWithdrawl(
+        uint256 accountId,
+        uint256 withdrawId
     ) external accountOwner(accountId) canApprove(accountId, withdrawId) {
         WithdrawRequest storage request = accounts[accountId].withdrawRequests[
             withdrawId
@@ -207,7 +212,11 @@ contract BankAccount {
         return accounts[accountId].withdrawRequests[withdrawId].approvals;
     }
 
-    function getAccounts() public view returns (uint[] memory) {
+    function getAccounts() public view returns (uint256[] memory) {
+        require(
+            userAccounts[msg.sender].length > 0,
+            "No accounts found for the user"
+        );
         return userAccounts[msg.sender];
     }
 }
