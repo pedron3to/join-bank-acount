@@ -3,44 +3,43 @@ import Head from "next/head";
 
 import { Contract, ethers } from "ethers";
 import { useEffect, useState } from "react";
-import deployment from "../deployment.json";
+import deployment from "../artifacts/contracts/BankAccount.sol/BankAccount.json";
 
 export default function Home() {
   const [contract, setContract] = useState<Contract | null>(null);
   const [events, setEvents] = useState([]);
 
-  console.log(
-    "FUNCTIONS",
-    contract?.interface.forEachFunction((f) => console.log(f))
-  );
+  console.log({ contract });
 
-  const address = deployment.contract.address;
-  const abi = deployment.contract.abi;
+  const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+  const abi = deployment.abi;
   const initializeContract = async () => {
     const provider = new ethers.BrowserProvider(window.ethereum);
 
     await provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
-    const newContract = new ethers.Contract(address, abi, signer);
+    const newContract = new ethers.Contract(
+      address,
+      abi as ethers.InterfaceAbi,
+      signer
+    );
 
     setContract(newContract);
   };
 
   const createAccount = async () => {};
 
-  console.log({ contract });
   const viewAccounts = async () => {
     if (!contract) return;
 
-    const getAccountsFunction = contract.interface.fragments[7];
-
     try {
-      await contract.getFunction("getAccounts").call(null);
+      const test = await contract.getAccounts();
+
+      console.log({ test });
+      // await contract["getAccounts()"](address);
     } catch (error) {
       console.error({ error });
     }
-
-    console.log(result);
 
     // console.log({ accounts });
     // document.getElementById("accounts").innerHTML = JSON.stringify(accounts);
