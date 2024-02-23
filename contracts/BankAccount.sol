@@ -111,9 +111,7 @@ contract BankAccount {
         _;
     }
 
-    modifier verifyAccounts(uint256[] memory accounts) {
-        _;
-    }
+   
 
     //4. functions
 
