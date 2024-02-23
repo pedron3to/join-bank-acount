@@ -3,7 +3,22 @@ import Head from "next/head";
 
 import { Contract, ethers } from "ethers";
 import { useEffect, useState } from "react";
-import deployment from "../artifacts/contracts/BankAccount.sol/BankAccount.json";
+
+const abi = [
+  "event AccountCreated(address[] owners, uint256 indexed id, uint256 timestamp)",
+  "event Deposit(address indexed user, uint256 indexed accountId, uint256 value, uint256 timestamp)",
+  "event Withdraw(uint256 indexed withdrawId, uint256 timestamp)",
+  "event WithdrawRequested(address indexed user, uint256 indexed accountId, uint256 withdrawId, uint256 amount, uint256 timestamp)",
+  "function approveWithdrawl(uint256 accountId, uint256 withdrawId)",
+  "function createAccount(address[] otherOwners)",
+  "function deposit(uint256 accountId) payable",
+  "function getAccounts() view returns (uint256[])",
+  "function getApprovals(uint256 accountId, uint256 withdrawId) view returns (uint256)",
+  "function getBalance(uint256 accountId) view returns (uint256)",
+  "function getOwners(uint256 accountId) view returns (address[])",
+  "function requestWithdrawl(uint256 accountId, uint256 amount)",
+  "function withdraw(uint256 accountId, uint256 withdrawId)",
+];
 
 export default function Home() {
   const [contract, setContract] = useState<Contract | null>(null);
@@ -12,7 +27,7 @@ export default function Home() {
   console.log({ contract });
 
   const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-  const abi = deployment.abi;
+
   const initializeContract = async () => {
     const provider = new ethers.BrowserProvider(window.ethereum);
 
