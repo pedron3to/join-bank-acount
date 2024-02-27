@@ -217,6 +217,7 @@ contract BankAccount {
     }
 
     function getAccounts() public view returns (uint256[] memory) {
+        
         return userAccounts[msg.sender];
     }
 }

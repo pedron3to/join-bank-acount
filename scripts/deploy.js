@@ -10,14 +10,17 @@ async function main() {
 
   await bankAccount.waitForDeployment();
 
+
   await writeDeploymentInfo(bankAccount);
+
+
 }
 
 async function writeDeploymentInfo(contract) {
   const data = {
     contract: {
-      address: contract.runner.address,
-      // signerAddress: contract.signer.address,
+      address: contract.target,
+      signerAddress: contract.runner.address,
       abi: contract.interface.format(),
     },
   };
